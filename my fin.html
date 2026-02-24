@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finance Life Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gradient-to-br from-indigo-50 via-indigo-100 to-purple-100 p-6">
+
+<div class="max-w-6xl mx-auto space-y-6">
+
+<div class="bg-white rounded-2xl shadow p-6">
+<h1 class="text-3xl font-bold text-indigo-700">Finance Life Dashboard</h1>
+<p class="text-gray-500">Personal Wealth Tracker System</p>
+</div>
+
+<!-- Transaction Input -->
+<div class="grid md:grid-cols-3 gap-6">
+
+<div class="bg-white p-5 rounded-xl shadow space-y-3">
+<h2 class="text-lg font-semibold">Add Transaction</h2>
+
+<input id="date" type="date" class="border p-2 w-full rounded" />
+
+<input id="amount" type="number" placeholder="Amount" class="border p-2 w-full rounded" />
+
+<select id="type" class="border p-2 w-full rounded">
+<option>Income</option>
+<option>Expense</option>
+<option>Investment</option>
+</select>
+
+<button onclick="addTransaction()" class="bg-indigo-600 text-white w-full p-2 rounded hover:bg-indigo-700">
+Save Record
+</button>
+</div>
+
+<!-- Summary Cards -->
+<div class="md:col-span-2 grid md:grid-cols-3 gap-4">
+
+<div class="bg-green-50 p-5 rounded-xl shadow">
+<p class="text-gray-500">Total Income</p>
+<h2 id="income" class="text-2xl font-bold text-green-600">0 BDT</h2>
+</div>
+
+<div class="bg-red-50 p-5 rounded-xl shadow">
+<p class="text-gray-500">Total Expense</p>
+<h2 id="expense" class="text-2xl font-bold text-red-600">0 BDT</h2>
+</div>
+
+<div class="bg-blue-50 p-5 rounded-xl shadow">
+<p class="text-gray-500">Total Investment</p>
+<h2 id="investment" class="text-2xl font-bold text-blue-600">0 BDT</h2>
+</div>
+
+</div>
+
+</div>
+
+<!-- Transaction History -->
+<div class="bg-white p-5 rounded-xl shadow space-y-4">
+<h2 class="text-xl font-semibold">Transaction History</h2>
+<table class="w-full border text-sm">
+<thead class="bg-gray-100">
+<tr>
+<th class="p-2 border">Date</th>
+<th class="p-2 border">Type</th>
+<th class="p-2 border">Amount</th>
+</tr>
+</thead>
+<tbody id="history"></tbody>
+</table>
+</div>
+
+<!-- Insight -->
+<div class="bg-white p-5 rounded-xl shadow">
+<h2 class="text-lg font-semibold mb-2">Financial Insight</h2>
+<p id="insight" class="text-gray-600">System analyzing your financial life...</p>
+</div>
+
+</div>
+
+<script>
+let transactions = JSON.parse(localStorage.getItem("finance_life_data") || "[]");
+
+function addTransaction(){
+let date=document.getElementById("date").value;
+let amount=Number(document.getElementById("amount").value);
+let type=document.getElementById("type").value;
+
+if(!date || !amount) return;
+
+transactions.push({
+date,
+type,
+amount
+});
+
+localStorage.setItem("finance_life_data",JSON.stringify(transactions));
+
+updateDashboard();
+}
+
+function updateDashboard(){
+
+let income=0, expense=0, investment=0;
+let historyHTML="";
+
+transactions.forEach(t=>{
+if(t.type==="Income") income+=t.amount;
+if(t.type==="Expense") expense+=t.amount;
+if(t.type==="Investment") investment+=t.amount;
+
+historyHTML+=`
+<tr>
+<td class="border p-2">${t.date}</td>
+<td class="border p-2">${t.type}</td>
+<td class="border p-2">${t.amount}</td>
+</tr>
+`;
+});
+
+document.getElementById("income").innerText=income+" BDT";
+document.getElementById("expense").innerText=expense+" BDT";
+document.getElementById("investment").innerText=investment+" BDT";
+
+document.getElementById("history").innerHTML=historyHTML;
+
+let saving=income-expense-investment;
+
+let insight="Maintain financial discipline.";
+
+if(saving>income*0.5)
+insight="🚀 Excellent saving pattern.";
+else if(saving<0)
+insight="⚠ Expenses are higher than income.";
+
+document.getElementById("insight").innerText=insight;
+}
+
+updateDashboard();
+</script>
+
+</body>
+</html>
